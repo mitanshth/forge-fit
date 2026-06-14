@@ -1,0 +1,34 @@
+{
+  "name": "ForgeFit Hunter System",
+  "short_name": "ForgeFit",
+  "description": "A mobile-first AI workout, discipline, progress, and nutrition coach.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#080a12",
+  "theme_color": "#080a12",
+  "categories": ["fitness", "health", "lifestyle"],
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Log Progress",
+      "short_name": "Log",
+      "description": "Open daily progress tracking.",
+      "url": "./index.html#progress"
+    },
+    {
+      "name": "Workout Plan",
+      "short_name": "Plan",
+      "description": "Open the personalized workout plan.",
+      "url": "./index.html#workout"
+    }
+  ]
+}

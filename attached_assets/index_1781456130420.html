@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#080a12" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="ForgeFit" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>ForgeFit Hunter System</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="icons/icon.svg" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="firebase-config.js"></script>
+  </head>
+  <body>
+    <section class="onboarding" id="onboarding" aria-label="First visit setup">
+      <div class="onboarding-card">
+        <div class="onboarding-head">
+          <div class="brand-mark" aria-hidden="true">F</div>
+          <div>
+            <p class="eyebrow">Awakening setup</p>
+            <h1>Build your hunter profile</h1>
+          </div>
+        </div>
+        <form class="onboarding-form" id="onboardingForm">
+          <label>
+            Your name
+            <input id="setupName" type="text" autocomplete="name" placeholder="Name" required />
+          </label>
+          <label>
+            Email or login ID
+            <input id="setupEmail" type="email" autocomplete="email" placeholder="you@example.com" required />
+          </label>
+          <label>
+            Profile photo
+            <input id="setupPhoto" type="file" accept="image/*" />
+          </label>
+          <label>
+            Age
+            <input id="setupAge" type="number" min="13" max="90" value="25" required />
+          </label>
+          <label>
+            Gender
+            <select id="setupGender">
+              <option value="female">Female</option>
+              <option value="male">Male</option>
+              <option value="other">Other</option>
+            </select>
+          </label>
+          <label>
+            Height
+            <input id="setupHeight" type="number" min="120" max="230" value="170" placeholder="cm" required />
+          </label>
+          <label>
+            Current weight
+            <input id="setupCurrentWeight" type="number" min="25" max="300" step="0.1" value="75" required />
+          </label>
+          <label>
+            Target weight
+            <input id="setupTargetWeight" type="number" min="25" max="300" step="0.1" value="70" required />
+          </label>
+          <fieldset class="choice-group wide" id="setupGoalGroup">
+            <legend>Main goals</legend>
+            <label><input type="checkbox" name="setupGoals" value="fat-loss" checked /> Fat loss</label>
+            <label><input type="checkbox" name="setupGoals" value="muscle" /> Build muscle</label>
+            <label><input type="checkbox" name="setupGoals" value="strength" /> Strength</label>
+            <label><input type="checkbox" name="setupGoals" value="endurance" /> Endurance</label>
+            <label><input type="checkbox" name="setupGoals" value="discipline" /> Discipline</label>
+          </fieldset>
+          <label>
+            Experience
+            <select id="setupExperience">
+              <option value="beginner">Beginner</option>
+              <option value="intermediate">Intermediate</option>
+              <option value="advanced">Advanced</option>
+            </select>
+          </label>
+          <label>
+            Days per week
+            <input id="setupDaysPerWeek" type="number" min="2" max="6" step="1" value="4" required />
+          </label>
+          <fieldset class="choice-group wide" id="setupEquipmentGroup">
+            <legend>Equipment</legend>
+            <label><input type="checkbox" name="setupEquipment" value="bodyweight" checked /> Bodyweight</label>
+            <label><input type="checkbox" name="setupEquipment" value="dumbbells" /> Dumbbells</label>
+            <label><input type="checkbox" name="setupEquipment" value="gym" /> Full gym</label>
+            <label><input type="checkbox" name="setupEquipment" value="bands" /> Resistance bands</label>
+          </fieldset>
+          <label>
+            Activity level
+            <select id="setupActivityLevel">
+              <option value="low">Mostly sitting</option>
+              <option value="moderate">Moderately active</option>
+              <option value="high">Very active</option>
+            </select>
+          </label>
+          <label>
+            Dietary preference
+            <select id="setupDiet">
+              <option value="balanced">Balanced</option>
+              <option value="vegetarian">Vegetarian</option>
+              <option value="vegan">Vegan</option>
+              <option value="high-protein">High protein</option>
+              <option value="low-carb">Low carb</option>
+            </select>
+          </label>
+          <label>
+            Food culture
+            <select id="setupFoodCulture">
+              <option value="indian">Indian</option>
+              <option value="mediterranean">Mediterranean</option>
+              <option value="east-asian">East Asian</option>
+              <option value="mexican">Mexican</option>
+              <option value="middle-eastern">Middle Eastern</option>
+              <option value="western">Western</option>
+            </select>
+          </label>
+          <label class="wide">
+            Injuries or limits
+            <input id="setupInjuries" type="text" placeholder="Knee pain, back pain, none" />
+          </label>
+          <label class="wide">
+            Foods to avoid
+            <input id="setupAvoidFoods" type="text" placeholder="Eggs, dairy, peanuts, none" />
+          </label>
+          <button class="primary-button wide" type="submit">Enter The System</button>
+        </form>
+      </div>
+    </section>
+
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="App navigation">
+        <div class="brand">
+          <div class="profile-photo" id="profilePhoto" aria-hidden="true">F</div>
+          <div>
+            <h1>ForgeFit</h1>
+            <p id="profileCaption">Hunter discipline system</p>
+          </div>
+        </div>
+        <nav class="nav-tabs" aria-label="Sections">
+            <button class="tab active" data-view="dashboard" type="button">System</button>
+            <button class="tab" data-view="workout" type="button">Daily Quest</button>
+            <button class="tab" data-view="homeWorkout" type="button">Home Workout</button>
+          <button class="tab" data-view="nutrition" type="button">Nutrition</button>
+            <button class="tab" data-view="progress" type="button">Rank</button>
+          <button class="tab" data-view="settings" type="button">Settings</button>
+        </nav>
+        <div class="streak-panel">
+          <span class="label">Current streak</span>
+          <strong id="streakDays">0 days</strong>
+          <span id="streakHint">Clear today's quest to start momentum.</span>
+        </div>
+      </aside>
+
+      <main class="content">
+        <section class="topbar">
+          <div>
+            <p class="eyebrow" id="todayLabel">Today</p>
+            <h2 id="dailyHeadline">Build the body that keeps promises.</h2>
+          </div>
+          <div class="topbar-actions">
+            <button class="secondary-button install-button" id="installButton" type="button" hidden>Install App</button>
+            <button class="icon-button" id="notifyButton" type="button" title="Enable daily notifications" aria-label="Enable daily notifications">
+              <span aria-hidden="true">!</span>
+            </button>
+            <button class="primary-button" id="completeWorkoutButton" type="button">Clear Quest</button>
+          </div>
+        </section>
+
+        <section class="view active-view" id="dashboard">
+          <div class="hero-panel">
+            <div class="hero-copy">
+              <span class="status-pill" id="coachMode">System online</span>
+              <h3 id="coachMessage">Your coach is warming up.</h3>
+              <p id="coachDetail">Set your profile once and ForgeFit will shape your week like a hunter system: quests, recovery, meals, and rank progress.</p>
+              <div class="hero-actions">
+                <button class="primary-button" id="generatePlanButton" type="button">Open Gate</button>
+                <button class="secondary-button" data-jump="settings" type="button">Tune Profile</button>
+              </div>
+            </div>
+            <div class="readiness-card">
+              <span class="label">Readiness</span>
+              <div class="score-ring">
+                <span id="readinessScore">78</span>
+              </div>
+              <p id="readinessText">Balanced intensity today.</p>
+            </div>
+          </div>
+
+          <div class="metric-grid">
+            <article class="metric">
+              <span class="label">Weekly quests</span>
+              <strong id="weeklyWorkouts">0 / 4</strong>
+              <meter id="weeklyMeter" min="0" max="4" value="0"></meter>
+            </article>
+            <article class="metric">
+              <span class="label">Discipline score</span>
+              <strong id="disciplineScore">0%</strong>
+              <meter id="disciplineMeter" min="0" max="100" value="0"></meter>
+            </article>
+            <article class="metric">
+              <span class="label">Rank progress</span>
+              <strong id="goalProgress">0%</strong>
+              <meter id="goalMeter" min="0" max="100" value="0"></meter>
+            </article>
+            <article class="metric">
+              <span class="label">Daily protein</span>
+              <strong id="proteinTarget">120g</strong>
+              <meter id="proteinMeter" min="0" max="200" value="120"></meter>
+            </article>
+          </div>
+
+          <div class="split-grid">
+            <section class="panel">
+              <div class="panel-head">
+                <h3>Today&apos;s Gate</h3>
+                <button class="small-button" id="swapWorkoutButton" type="button">Swap</button>
+              </div>
+              <div id="todayWorkout" class="workout-block"></div>
+            </section>
+            <section class="panel">
+              <div class="panel-head">
+                <h3>System Notes</h3>
+              </div>
+              <ul class="coach-list" id="coachNotes"></ul>
+            </section>
+          </div>
+          <section class="panel checkin-panel">
+            <div class="panel-head">
+              <h3>Daily Check-in</h3>
+              <span class="status-pill dark" id="checkinStatus">Not logged</span>
+            </div>
+            <form class="checkin-form" id="quickCheckinForm">
+              <label>
+                Sleep
+                <input id="quickSleep" type="number" min="0" max="14" step="0.5" value="7" />
+              </label>
+              <label>
+                Water
+                <input id="quickWater" type="number" min="0" max="8" step="0.5" value="2" />
+              </label>
+              <label>
+                Soreness
+                <input id="quickSoreness" type="range" min="1" max="10" value="4" />
+              </label>
+              <label>
+                Steps
+                <input id="quickSteps" type="number" min="0" max="60000" step="500" value="5000" />
+              </label>
+              <button class="primary-button" type="submit">Save Check-in</button>
+            </form>
+          </section>
+        </section>
+
+        <section class="view" id="workout">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Personalized training</p>
+              <h2>Your Weekly Plan</h2>
+            </div>
+            <button class="primary-button" id="refreshPlanButton" type="button">Refresh Plan</button>
+          </div>
+          <div class="plan-grid" id="weeklyPlan"></div>
+        </section>
+
+        <section class="view" id="homeWorkout">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">No gym required</p>
+              <h2>Home Workout Room</h2>
+            </div>
+            <button class="primary-button" id="refreshHomeWorkoutButton" type="button">New Home Plan</button>
+          </div>
+          <div class="split-grid">
+            <section class="panel">
+              <div class="panel-head">
+                <h3>Easy At-Home Quests</h3>
+              </div>
+              <div class="home-workout-grid" id="homeWorkoutGrid"></div>
+            </section>
+            <section class="panel">
+              <div class="panel-head">
+                <h3>Tutorial Videos</h3>
+              </div>
+              <div class="video-grid" id="tutorialVideoGrid"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="nutrition">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Nutrition coach</p>
+              <h2>Culture-Based Food Guidance</h2>
+            </div>
+            <button class="secondary-button" id="newRecipeButton" type="button">New Recipes</button>
+          </div>
+          <div class="split-grid">
+            <section class="panel">
+              <h3>Daily Targets</h3>
+              <div class="nutrition-targets" id="nutritionTargets"></div>
+            </section>
+            <section class="panel">
+              <h3>Food Rules</h3>
+              <ul class="coach-list" id="nutritionTips"></ul>
+            </section>
+          </div>
+          <div class="recipe-grid" id="recipeGrid"></div>
+          <section class="panel">
+            <div class="panel-head">
+              <h3>7-Day Protein Meal Plan</h3>
+              <span class="status-pill dark" id="mealPlanTarget">Protein target</span>
+            </div>
+            <div class="meal-plan-grid" id="mealPlanGrid"></div>
+          </section>
+        </section>
+
+        <section class="view" id="progress">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Rank tracker</p>
+              <h2>Log and Level Up</h2>
+            </div>
+          </div>
+          <form class="log-form" id="progressForm">
+            <label>
+              Body weight
+              <input id="logWeight" type="number" min="25" max="300" step="0.1" placeholder="kg" />
+            </label>
+            <label>
+              Quest effort
+              <input id="logEffort" type="range" min="1" max="10" value="7" />
+              <span id="effortValue">7 / 10</span>
+            </label>
+            <label>
+              Protein eaten
+              <input id="logProtein" type="number" min="0" max="350" step="1" placeholder="grams" />
+            </label>
+            <label>
+              Mood
+              <select id="logMood">
+                <option>Focused</option>
+                <option>Energetic</option>
+                <option>Tired</option>
+                <option>Stressed</option>
+                <option>Unstoppable</option>
+              </select>
+            </label>
+            <label>
+              Sleep
+              <input id="logSleep" type="number" min="0" max="14" step="0.5" placeholder="hours" />
+            </label>
+            <label>
+              Water
+              <input id="logWater" type="number" min="0" max="8" step="0.5" placeholder="liters" />
+            </label>
+            <button class="primary-button" type="submit">Save Today</button>
+          </form>
+          <div class="split-grid">
+            <section class="panel">
+              <h3>Weight Trend</h3>
+              <canvas id="weightChart" width="640" height="280" aria-label="Weight trend chart"></canvas>
+            </section>
+            <section class="panel">
+              <h3>Recent Logs</h3>
+              <div id="logList" class="log-list"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="settings">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Hunter profile</p>
+              <h2>Personalize ForgeFit</h2>
+            </div>
+          </div>
+          <form class="settings-grid" id="settingsForm">
+            <label>
+              Your name
+              <input id="name" type="text" placeholder="Name" />
+            </label>
+            <label>
+              Login email
+              <input id="email" type="email" placeholder="you@example.com" />
+            </label>
+            <label class="wide">
+              Profile photo
+              <input id="photoInput" type="file" accept="image/*" />
+            </label>
+            <label>
+              Age
+              <input id="age" type="number" min="13" max="90" value="25" />
+            </label>
+            <label>
+              Gender
+              <select id="gender">
+                <option value="female">Female</option>
+                <option value="male">Male</option>
+                <option value="other">Other</option>
+              </select>
+            </label>
+            <label>
+              Height
+              <input id="height" type="number" min="120" max="230" value="170" />
+            </label>
+            <fieldset class="choice-group wide" id="goalGroup">
+              <legend>Main goals</legend>
+              <label><input type="checkbox" name="goals" value="fat-loss" /> Fat loss</label>
+              <label><input type="checkbox" name="goals" value="muscle" /> Build muscle</label>
+              <label><input type="checkbox" name="goals" value="strength" /> Strength</label>
+              <label><input type="checkbox" name="goals" value="endurance" /> Endurance</label>
+              <label><input type="checkbox" name="goals" value="discipline" /> Discipline</label>
+            </fieldset>
+            <label>
+              Experience
+              <select id="experience">
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+              </select>
+            </label>
+            <label>
+              Days per week
+              <input id="daysPerWeek" type="number" min="2" max="6" step="1" value="4" />
+            </label>
+            <label>
+              Session length
+              <select id="sessionLength">
+                <option value="30">30 minutes</option>
+                <option value="45">45 minutes</option>
+                <option value="60">60 minutes</option>
+              </select>
+            </label>
+            <fieldset class="choice-group wide" id="equipmentGroup">
+              <legend>Equipment</legend>
+              <label><input type="checkbox" name="equipment" value="bodyweight" /> Bodyweight</label>
+              <label><input type="checkbox" name="equipment" value="dumbbells" /> Dumbbells</label>
+              <label><input type="checkbox" name="equipment" value="gym" /> Full gym</label>
+              <label><input type="checkbox" name="equipment" value="bands" /> Resistance bands</label>
+            </fieldset>
+            <label>
+              Dietary preference
+              <select id="diet">
+                <option value="balanced">Balanced</option>
+                <option value="vegetarian">Vegetarian</option>
+                <option value="vegan">Vegan</option>
+                <option value="high-protein">High protein</option>
+                <option value="low-carb">Low carb</option>
+              </select>
+            </label>
+            <label>
+              Food culture
+              <select id="foodCulture">
+                <option value="indian">Indian</option>
+                <option value="mediterranean">Mediterranean</option>
+                <option value="east-asian">East Asian</option>
+                <option value="mexican">Mexican</option>
+                <option value="middle-eastern">Middle Eastern</option>
+                <option value="western">Western</option>
+              </select>
+            </label>
+            <label>
+              Activity level
+              <select id="activityLevel">
+                <option value="low">Mostly sitting</option>
+                <option value="moderate">Moderately active</option>
+                <option value="high">Very active</option>
+              </select>
+            </label>
+            <label>
+              Current weight
+              <input id="currentWeight" type="number" min="25" max="300" step="0.1" value="75" />
+            </label>
+            <label>
+              Target weight
+              <input id="targetWeight" type="number" min="25" max="300" step="0.1" value="70" />
+            </label>
+            <label>
+              Daily notification time
+              <input id="notificationTime" type="time" value="07:00" />
+            </label>
+            <section class="push-panel wide" aria-label="Push notification setup">
+              <div>
+                <p class="eyebrow">Push notifications</p>
+                <h3>Firebase / Capacitor Ready</h3>
+                <p id="pushStatus">Tap the alert button above after adding your Firebase config.</p>
+              </div>
+              <label>
+                Device push token
+                <textarea id="pushToken" readonly placeholder="Token appears here after push registration"></textarea>
+              </label>
+            </section>
+            <label class="wide">
+              Motivation style
+              <select id="motivationStyle">
+                <option value="direct">Direct coach</option>
+                <option value="calm">Calm and steady</option>
+                <option value="competitive">Competitive push</option>
+              </select>
+            </label>
+            <label class="wide">
+              Injuries or movement limits
+              <input id="injuries" type="text" placeholder="Knee pain, back pain, none" />
+            </label>
+            <label class="wide">
+              Foods to avoid
+              <input id="avoidFoods" type="text" placeholder="Eggs, dairy, peanuts, none" />
+            </label>
+            <section class="data-vault wide" aria-label="Data vault">
+              <div>
+                <p class="eyebrow">Data vault</p>
+                <h3>Protect Your Progress</h3>
+                <p>Your profile and logs are mirrored into browser storage. Keep a backup file for extra safety.</p>
+              </div>
+              <div class="vault-actions">
+                <button class="secondary-button" id="backupDataButton" type="button">Download Backup</button>
+                <button class="secondary-button" id="restoreDataButton" type="button">Restore Backup</button>
+                <input id="restoreDataInput" type="file" accept="application/json,.json" hidden />
+              </div>
+              <span id="vaultStatus">Vault ready.</span>
+            </section>
+            <button class="primary-button wide" type="submit">Save Profile</button>
+          </form>
+        </section>
+      </main>
+    </div>
+
+    <nav class="mobile-nav" aria-label="Mobile navigation">
+      <button class="mobile-tab active" data-view="dashboard" type="button">System</button>
+      <button class="mobile-tab" data-view="workout" type="button">Quest</button>
+      <button class="mobile-tab" data-view="homeWorkout" type="button">Home</button>
+      <button class="mobile-tab" data-view="nutrition" type="button">Food</button>
+      <button class="mobile-tab" data-view="progress" type="button">Rank</button>
+      <button class="mobile-tab" data-view="settings" type="button">Me</button>
+    </nav>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <div class="install-tip" id="installTip" hidden>
+      <strong>Install on mobile</strong>
+      <span>Use your browser menu and choose Add to Home Screen.</span>
+    </div>
+    <script src="app.js"></script>
+    <script src="posture-fix.js"></script>
+  </body>
+</html>
