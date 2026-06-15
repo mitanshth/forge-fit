@@ -1,12 +1,22 @@
+import { useState } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
-import { useListWeightLogs, useGetDashboard } from "@workspace/api-client-react";
+import { useListWeightLogs, useGetDashboard, useCreateWeightLog, getListWeightLogsQueryKey } from "@workspace/api-client-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { getHunterRank, getHunterTitle, getRankColor, getRankProgress, calcTotalXp, getAchievements, RANKS } from "@/lib/rank";
-import { Lock, Trophy } from "lucide-react";
+import { triggerQuestCompletion } from "@/lib/quests";
+import { Lock, Trophy, Plus } from "lucide-react";
 
 export default function Progress() {
+  const queryClient = useQueryClient();
   const { data: weightLogs, isLoading: weightLoading } = useListWeightLogs();
   const { data: dashboard, isLoading: dashLoading } = useGetDashboard();
+  const createWeight = useCreateWeightLog();
+
+  const [weightInput, setWeightInput] = useState("");
+  const [logged, setLogged] = useState(false);
 
   const totalWorkouts = dashboard?.totalWorkouts ?? 0;
   const streakDays = dashboard?.streakDays ?? 0;
@@ -26,6 +36,17 @@ export default function Progress() {
     weight: log.weight,
   })).reverse() ?? [];
 
+  const handleLogWeight = async () => {
+    const kg = parseFloat(weightInput);
+    if (!kg || isNaN(kg)) return;
+    await createWeight.mutateAsync({ data: { weight: kg } });
+    queryClient.invalidateQueries({ queryKey: getListWeightLogsQueryKey() });
+    triggerQuestCompletion("weight_logged");
+    setWeightInput("");
+    setLogged(true);
+    setTimeout(() => setLogged(false), 2000);
+  };
+
   if (dashLoading) {
     return <div className="text-primary text-xl tracking-widest animate-pulse flex h-full items-center justify-center">LOADING HUNTER DATA...</div>;
   }
@@ -41,8 +62,9 @@ export default function Progress() {
         </p>
       </header>
 
-      {/* Rank + Progress */}
+      {/* Rank + Weight chart */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Rank card */}
         <Card className="bg-card/40 border-primary/20">
           <CardHeader>
             <CardTitle className="tracking-widest uppercase text-sm">Rank Progression</CardTitle>
@@ -76,8 +98,8 @@ export default function Progress() {
               </div>
             </div>
 
-            {/* All ranks ladder */}
-            <div className="w-full grid grid-cols-4 gap-2 mt-2">
+            {/* Rank ladder */}
+            <div className="w-full grid grid-cols-4 gap-2">
               {RANKS.map(r => {
                 const isActive = r.name === rank;
                 const isPassed = totalWorkouts >= r.minWorkouts;
@@ -100,18 +122,43 @@ export default function Progress() {
           </CardContent>
         </Card>
 
-        {/* Weight Chart */}
+        {/* Weight chart + log */}
         <Card className="bg-card/40 border-primary/20">
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="tracking-widest uppercase text-sm">Mass Evaluation</CardTitle>
+            {/* Quick log weight */}
+            <div className="flex items-center gap-2">
+              <Input
+                type="number"
+                value={weightInput}
+                onChange={e => setWeightInput(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && handleLogWeight()}
+                placeholder="kg"
+                className="w-20 h-8 bg-background/60 border-primary/20 font-mono text-sm focus-visible:ring-primary/50 text-center"
+                data-testid="input-weight"
+              />
+              <Button
+                onClick={handleLogWeight}
+                disabled={createWeight.isPending || !weightInput}
+                size="sm"
+                className={`h-8 px-3 border font-bold tracking-wider text-xs transition-all ${
+                  logged
+                    ? "bg-green-500/20 border-green-500/50 text-green-400"
+                    : "bg-primary/20 hover:bg-primary/40 border-primary/50 text-primary hover:text-white"
+                }`}
+                data-testid="button-log-weight"
+              >
+                {logged ? "LOGGED" : <><Plus className="w-3 h-3 mr-1" />LOG</>}
+              </Button>
+            </div>
           </CardHeader>
-          <CardContent className="h-[320px] w-full">
+          <CardContent className="h-[280px] w-full">
             {weightLoading ? (
               <div className="w-full h-full flex items-center justify-center text-primary animate-pulse tracking-widest">CALIBRATING...</div>
             ) : chartData.length === 0 ? (
               <div className="w-full h-full flex flex-col items-center justify-center gap-3 text-muted-foreground font-mono opacity-50">
-                <p className="tracking-widest">NO WEIGHT DATA LOGGED</p>
-                <p className="text-xs">Log your weight in the Progress tab</p>
+                <p className="tracking-widest">NO WEIGHT DATA</p>
+                <p className="text-xs">Enter your weight above and press LOG</p>
               </div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
@@ -134,9 +181,7 @@ export default function Progress() {
       {/* Achievements */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold tracking-widest uppercase text-foreground">
-            Shadow Titles
-          </h2>
+          <h2 className="text-xl font-bold tracking-widest uppercase text-foreground">Shadow Titles</h2>
           <span className="text-sm text-muted-foreground tracking-wider">
             <span className="text-primary font-bold">{unlockedCount}</span> / {achievements.length} UNLOCKED
           </span>

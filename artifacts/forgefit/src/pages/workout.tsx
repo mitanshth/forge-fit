@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Plus, Trash2, CheckCircle, Zap, X } from "lucide-react";
 import { calcTotalXp, getHunterRank } from "@/lib/rank";
+import { triggerQuestCompletion } from "@/lib/quests";
 
 const WORKOUT_TYPES = ["Gym", "Cardio", "Home", "Custom"];
 
@@ -58,6 +59,12 @@ export default function Workout() {
     queryClient.invalidateQueries({ queryKey: getListWorkoutLogsQueryKey() });
     queryClient.invalidateQueries({ queryKey: getGetDashboardQueryKey() });
 
+    const typeLower = workoutType.toLowerCase();
+    triggerQuestCompletion("workout_logged");
+    if (typeLower === "gym") triggerQuestCompletion("gym_logged");
+    if (typeLower === "cardio") triggerQuestCompletion("cardio_logged");
+    if (typeLower === "home") triggerQuestCompletion("home_logged");
+    if (filled.length >= 5) triggerQuestCompletion("five_exercises");
     setXpToast({ xp: xpEarned, workout: `${workoutType} — ${day}` });
     setTimeout(() => setXpToast(null), 3500);
 

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { triggerQuestCompletion } from "@/lib/quests";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,7 @@ export default function Nutrition() {
     const updated = [newLog, ...logs];
     setLogs(updated);
     localStorage.setItem("forgefit_nutrition", JSON.stringify(updated));
+    triggerQuestCompletion("meal_logged");
     setMeal("");
     setCalories("");
   };

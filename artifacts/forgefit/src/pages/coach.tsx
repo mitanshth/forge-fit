@@ -8,6 +8,7 @@ import {
   getGetOpenaiConversationQueryKey,
 } from "@workspace/api-client-react";
 import { Card } from "@/components/ui/card";
+import { triggerQuestCompletion } from "@/lib/quests";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Send, TerminalSquare, Plus, Trash2, MessageSquare } from "lucide-react";
@@ -159,6 +160,7 @@ export default function Coach() {
       });
 
       queryClient.invalidateQueries({ queryKey: getGetOpenaiConversationQueryKey(activeId) });
+      triggerQuestCompletion("message_sent");
     } catch (err: unknown) {
       if (err instanceof Error && err.name !== "AbortError") {
         setLocalMessages(prev => {

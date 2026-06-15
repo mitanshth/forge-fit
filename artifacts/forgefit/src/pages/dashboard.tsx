@@ -3,6 +3,7 @@ import { useGetDashboard, getGetDashboardQueryKey } from "@workspace/api-client-
 import { useQueryClient } from "@tanstack/react-query";
 import { getHunterRank, getHunterTitle, getRankColor, getRankProgress, calcTotalXp, RANKS } from "@/lib/rank";
 import { SystemNotification } from "@/components/SystemNotification";
+import { DailyQuests } from "@/components/DailyQuests";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trophy, Flame, Activity, Target, Zap } from "lucide-react";
 
@@ -156,7 +157,10 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        {/* Shadow Army Banner */}
+        {/* Daily Quests */}
+      <DailyQuests />
+
+      {/* Shadow Army Banner */}
         <div className="bg-card/20 border border-primary/20 rounded-lg p-8 text-center relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent pointer-events-none" />
           <p className="text-muted-foreground/50 text-xs tracking-[0.4em] mb-3">THE SYSTEM SPEAKS</p>
